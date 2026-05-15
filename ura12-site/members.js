@@ -1,3 +1,6 @@
+// Shared birthday target — countdown unlock & celebration trigger
+window.URA_BIRTHDAY_TS = new Date("2026-05-17T00:00:00+02:00").getTime();
+
 // Member shape mapping — design element not stored in Supabase
 window.SHAPE_MAP = {
   kevin:    'square',
@@ -53,6 +56,23 @@ window.membersReady = window._supa
     }
     window.MEMBERS = res.data.map(_mapMember);
   });
+
+// Member image resolver — picks the matching PNG in /images for a member
+// kind = 'pdp' (profile picture) or 'full' (full body)
+window.MEMBER_IMG_KEYS = ['kevin','yuan','alexis','ayoub','anton','marc','theo','giovanni'];
+window.memberImg = function(m, kind) {
+  if (!m) return null;
+  var cands = [
+    m.id,
+    String(m.name || '').toLowerCase().split(/[\s._-]+/)[0],
+    String(m.id   || '').split(/[._-]/)[0],
+  ];
+  for (var i = 0; i < cands.length; i++) {
+    var c = cands[i];
+    if (c && window.MEMBER_IMG_KEYS.indexOf(c) !== -1) return 'images/' + c + '_' + kind + '.png';
+  }
+  return 'images/' + m.id + '_' + kind + '.png';
+};
 
 // Shape SVG renderer — used for stickers AND avatars consistently
 window.shapeSvg = function(shape, color, size) {

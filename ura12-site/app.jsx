@@ -197,11 +197,13 @@ function App() {
     setActiveId(id);
   };
 
+  const [showBirthday, setShowBirthday] = aS(false);
   const onLogin = (memberId) => {
     setUser(window.MEMBERS.find(m => m.id === memberId));
     setShowLogin(false);
     findEgg("connexion");
     startMusic();
+    if (Date.now() >= window.URA_BIRTHDAY_TS) setShowBirthday(true);
   };
 
   const onSequenceComplete = () => {
@@ -253,6 +255,8 @@ function App() {
         </div>
       </div>
 
+      {!showLogin && <window.DesktopArtefacts />}
+
       <window.FloatingStickers
         onSequenceComplete={onSequenceComplete}
         eggsFound={eggs.size}
@@ -286,6 +290,8 @@ function App() {
       ))}
 
       {memberDetailId && <window.MemberDetail member={window.MEMBERS.find(m => m.id === memberDetailId)} onClose={() => setMemberDetailId(null)} />}
+
+      {showBirthday && <window.BirthdayCelebration user={user} onDone={() => setShowBirthday(false)} />}
 
       {toast && (
         <div style={{

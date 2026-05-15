@@ -2,17 +2,18 @@
 const { useState: stkS, useEffect: stkE, useRef: stkR } = React;
 
 const STICKER_QUIPS = {
-  kevin:  ["wait wait wait check this", "we keeping the name", "one more game?"],
-  yuan:   ["actually, the spreadsheet says…", "let me run the numbers", "i made a chart"],
-  alexis: ["ok hear me out", "plot twist incoming", "i'll reply in 2031"],
-  ayoub:  ["bro it's literally one line", "the bot is up. now it's down.", "patience."],
-  anton:  ["pinned message from november", "i have receipts", "october 2022 says hi"],
-  marc:   ["BRO LISTEN", "i walked into a lamppost", "(volume too high)"],
-  theo:   ["i was thinking in the shower", "back from the woods", "have you considered…"],
-  giovanni:["i'll be there in 5 (lying)", "gn 🌙 (it's 6am)", "the vibes are immaculate"]
+  kevin:  ["Ah ouais je m'en rappelle", "Tqt tqt tqt tqt"],
+  yuan:   ["J'ai rêvé de toi hier soir..", "Tu connais ce parfum ?"],
+  alexis: ["Comment va mon pote ?", "Bon mon pote, tu connais déjà hein"],
+  ayoub:  ["J'ai jamais dit ça !", "Nan moi je condamne", "Les femmes sont aussi fortes que les hommes"],
+  anton:  ["Si seulement j'avais le pouvoir de la vitesse", "Regardez qui m'a envoyé un msg", "Les femmes c'est trop bien"],
+  marc:   ["Je le jure sur mon prénom", "Si j'ai tort je m'appelle pas Marc", "Lisez Moi quand je me réincarne en Sexy Dragon"],
+  theo:   ["Devine j'ai croisé qui aujourd'hui", "Ayoub y a une organisation qui t'appelle"],
+  giovanni:["Et c'est moi le Roi ?", "Donc là on va rien dire ?", "Nom d'un Zeus !"]
 };
 
 const SECRET_SEQUENCE = ["kevin", "ayoub", "yuan", "giovanni", "marc", "theo", "anton", "alexis"];
+
 
 function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode, visible }) {
   const [seq, setSeq] = stkS([]);
@@ -103,7 +104,9 @@ function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode,
               display: "flex", alignItems: "center", justifyContent: "center",
               position: "relative"
             }}>
-              <div dangerouslySetInnerHTML={{ __html: window.shapeSvg(m.shape, m.color, 70) }}/>
+              <img src={window.memberImg(m, 'full')} alt={m.name} draggable={false}
+                onError={(e) => { console.warn("sticker img 404:", e.currentTarget.src, "for", m); }}
+                style={{ width: 70, height: 70, objectFit: "contain", pointerEvents: "none", userSelect: "none" }}/>
               <div style={{
                 position: "absolute", bottom: -8, left: "50%", transform: "translateX(-50%)",
                 background: "var(--ink)", color: "white",
@@ -132,3 +135,71 @@ function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode,
 
 window.FloatingStickers = FloatingStickers;
 window.SECRET_SEQUENCE = SECRET_SEQUENCE;
+
+// ── Decorative artefacts — scattered, non-interactive ─────────────────────────
+const ARTEFACT_FILES = [
+  "ballon", "camping", "erwin", "haltere", "lol",
+  "parfum", "popcorn", "sword", "voc", "yumeko"
+];
+
+function DesktopArtefacts() {
+  const layout = stkS(() => {
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    // Hand-tuned anchors so artefacts hug edges/corners and avoid
+    // the central area where windows open & the left desktop-icon column.
+    const anchors = [
+      { x: 0.18, y: 0.08 },
+      { x: 0.42, y: 0.04 },
+      { x: 0.66, y: 0.10 },
+      { x: 0.88, y: 0.22 },
+      { x: 0.92, y: 0.58 },
+      { x: 0.74, y: 0.82 },
+      { x: 0.48, y: 0.86 },
+      { x: 0.22, y: 0.82 },
+      { x: 0.10, y: 0.55 },
+      { x: 0.30, y: 0.42 },
+    ];
+    return ARTEFACT_FILES.map((name, i) => {
+      const a = anchors[i % anchors.length];
+      const size = 56 + Math.floor(Math.random() * 28); // 56..84
+      const rot  = Math.floor(Math.random() * 24) - 12; // -12..+12 deg
+      return {
+        name,
+        x: Math.max(8, Math.min(W - size - 8, a.x * W - size / 2)),
+        y: Math.max(8, Math.min(H - 60 - size, a.y * H - size / 2)),
+        size,
+        rot,
+      };
+    });
+  })[0];
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1,
+      pointerEvents: "none", userSelect: "none", overflow: "hidden",
+    }}>
+      {layout.map((a) => (
+        <img key={a.name}
+          src={`images/artefacts/${a.name}.png`}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          style={{
+            position: "absolute",
+            left: a.x, top: a.y,
+            width: a.size, height: a.size,
+            objectFit: "contain",
+            transform: `rotate(${a.rot}deg)`,
+            filter: "drop-shadow(2px 3px 0 rgba(0,0,0,0.22))",
+            opacity: 0.92,
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+window.DesktopArtefacts = DesktopArtefacts;

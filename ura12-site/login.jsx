@@ -70,8 +70,10 @@ function LoginScreen({ onLogin }) {
                     onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
                     onMouseLeave={(e) => e.currentTarget.style.transform = ""}
                   >
-                    <div style={{ width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center" }}
-                      dangerouslySetInnerHTML={{ __html: window.shapeSvg(m.shape, m.color, 56) }}/>
+                    <div style={{ width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                      <img src={window.memberImg(m, 'pdp')} alt={m.name} draggable={false}
+                        style={{ width: 56, height: 56, objectFit: "contain", pointerEvents: "none", userSelect: "none" }}/>
+                    </div>
                     <div style={{ fontWeight: "bold", fontSize: 13 }}>{m.name}</div>
                   </button>
                 ))}
@@ -85,8 +87,10 @@ function LoginScreen({ onLogin }) {
           {stage === "pw" && (
             <form onSubmit={submit}>
               <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-                <div style={{ width: 80, height: 80, background: "linear-gradient(135deg, #FFFFFF, #FFE6BE)", border: "1px solid #8A7A55", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}
-                  dangerouslySetInnerHTML={{ __html: window.shapeSvg(window.MEMBERS.find(x => x.id === picked).shape, window.MEMBERS.find(x => x.id === picked).color, 64) }}/>
+                <div style={{ width: 80, height: 80, background: "linear-gradient(135deg, #FFFFFF, #FFE6BE)", border: "1px solid #8A7A55", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                  <img src={window.memberImg(window.MEMBERS.find(x => x.id === picked), 'pdp')} alt={window.MEMBERS.find(x => x.id === picked).name} draggable={false}
+                    style={{ width: 70, height: 70, objectFit: "contain", pointerEvents: "none", userSelect: "none" }}/>
+                </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 22, color: "var(--red-3)" }}>{window.MEMBERS.find(x => x.id === picked).name}</div>
                   <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--ink-soft)" }}>@{window.MEMBERS.find(x => x.id === picked).handle}</div>

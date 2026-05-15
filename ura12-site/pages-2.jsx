@@ -255,11 +255,18 @@ function ArchivesPage() {
         ) : (
           <div key={i} style={{ display: "flex", gap: 10, padding: "6px 0" }}>
             <div style={{
-              width: 36, height: 36, background: colorOf(row.who), border: "1.5px solid var(--ink)",
-              borderRadius: 8, flexShrink: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "white", fontWeight: "bold", fontFamily: "var(--font-mono)"
-            }}>{nameOf(row.who)[0]}</div>
+              width: 36, height: 36, background: "white", border: "1.5px solid var(--ink)",
+              borderRadius: 8, flexShrink: 0, overflow: "hidden",
+              display: "flex", alignItems: "center", justifyContent: "center"
+            }}>
+              {(() => {
+                const mm = window.MEMBERS.find(x => x.id === row.who);
+                return mm
+                  ? <img src={window.memberImg(mm, 'pdp')} alt={mm.name} draggable={false}
+                      style={{ width: 32, height: 32, objectFit: "contain", pointerEvents: "none", userSelect: "none" }}/>
+                  : <span style={{ color: "var(--ink)", fontWeight: "bold", fontFamily: "var(--font-mono)" }}>{nameOf(row.who)[0]}</span>;
+              })()}
+            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                 <span style={{ fontWeight: "bold", color: colorOf(row.who) }}>{nameOf(row.who)}</span>

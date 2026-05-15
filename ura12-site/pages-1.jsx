@@ -5,7 +5,7 @@ const { useState: useS, useEffect: useE, useRef: useR, useMemo: useM } = React;
    HOME PAGE — countdown, welcome, hero
    ========================================================= */
 function HomePage({ user, onJump, eggsFound, totalEggs }) {
-  const target = new Date("2026-05-17T20:00:00").getTime();
+  const target = window.URA_BIRTHDAY_TS;
   const [now, setNow] = useS(Date.now());
   useE(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
   const diff = Math.max(0, target - now);
@@ -69,7 +69,7 @@ function HomePage({ user, onJump, eggsFound, totalEggs }) {
             fontSize: 13,
             color: "#FFE6BE",
             marginBottom: 10
-          }}>17 / 05 / 2026 — 20:00 CET</div>
+          }}>17 / 05 / 2026 — 00:00 CET</div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
             {[["JOURS", d], ["HEURES", h], ["MIN", m], ["SEC", s]].map(([lbl, val]) => (
@@ -174,9 +174,11 @@ function MembersPage({ onPickMember, selected }) {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.08)",
                 flexShrink: 0,
-              }}
-              dangerouslySetInnerHTML={{ __html: window.shapeSvg(m.shape, m.color, 50) }}
-              />
+                overflow: "hidden",
+              }}>
+                <img src={window.memberImg(m, 'pdp')} alt={m.name} draggable={false}
+                  style={{ width: 56, height: 56, objectFit: "contain", pointerEvents: "none", userSelect: "none" }}/>
+              </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                   <div style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontWeight: "bold", fontSize: 18, color: "var(--ink)" }}>{m.name}</div>
@@ -231,8 +233,12 @@ function MemberDetail({ member, onClose }) {
               borderRadius: 10,
               display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: "inset 0 -4px 8px rgba(0,0,0,0.08), 2px 2px 0 rgba(0,0,0,0.15)",
-              flexShrink: 0
-            }} dangerouslySetInnerHTML={{ __html: window.shapeSvg(member.shape, member.color, 78) }}/>
+              flexShrink: 0,
+              overflow: "hidden",
+            }}>
+              <img src={window.memberImg(member, 'pdp')} alt={member.name} draggable={false}
+                style={{ width: 86, height: 86, objectFit: "contain", pointerEvents: "none", userSelect: "none" }}/>
+            </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 26, color: "var(--red-3)" }}>{member.name}</div>
               <div style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>@{member.handle} • arrivé le {member.joined}</div>
