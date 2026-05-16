@@ -60,7 +60,10 @@ window.membersReady = window._supa
 // Member image resolver — picks the matching PNG in /images for a member
 // kind = 'pdp' (profile picture) or 'full' (full body)
 window.MEMBER_IMG_KEYS = ['kevin','yuan','alexis','ayoub','anton','marc','theo','giovanni'];
-window.memberImg = function(m, kind) {
+
+// Resolve a member object to its canonical key (kevin/yuan/...) regardless
+// of what the Supabase slug actually is. Returns null if no match.
+window.memberKey = function(m) {
   if (!m) return null;
   var cands = [
     m.id,
@@ -69,9 +72,15 @@ window.memberImg = function(m, kind) {
   ];
   for (var i = 0; i < cands.length; i++) {
     var c = cands[i];
-    if (c && window.MEMBER_IMG_KEYS.indexOf(c) !== -1) return 'images/' + c + '_' + kind + '.png';
+    if (c && window.MEMBER_IMG_KEYS.indexOf(c) !== -1) return c;
   }
-  return 'images/' + m.id + '_' + kind + '.png';
+  return null;
+};
+
+window.memberImg = function(m, kind) {
+  if (!m) return null;
+  var key = window.memberKey(m);
+  return 'images/' + (key || m.id) + '_' + kind + '.png';
 };
 
 // Shape SVG renderer — used for stickers AND avatars consistently

@@ -157,6 +157,34 @@ function DBStat({ label, v }) {
 /* =========================================================
    ARCHIVES — par année ET par channel (filtrables)
    ========================================================= */
+function ArchiveImage({ url }) {
+  const [failed, setFailed] = uS(false);
+  if (failed) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer"
+        style={{
+          display: "inline-flex", alignItems: "center", gap: 6,
+          marginTop: 6, padding: "6px 10px",
+          background: "#FFF1D6", border: "1px dashed #C9B488", borderRadius: 4,
+          fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ink-soft)",
+          textDecoration: "none", maxWidth: 320,
+        }}
+        title={url}>
+        <span>⚠️ image indisponible</span>
+        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {url.replace(/^https?:\/\//, "").slice(0, 40)}…
+        </span>
+      </a>
+    );
+  }
+  return (
+    <img src={url} alt="" loading="lazy"
+      style={{ marginTop: 6, maxWidth: 320, maxHeight: 240, borderRadius: 4, border: "1px solid #C9B488", display: "block" }}
+      onError={() => { console.warn("[archives] image failed:", url); setFailed(true); }}
+    />
+  );
+}
+
 function ArchivesPage() {
   const [grouped, setGrouped] = uS(null); // { year: { channel: [msg] } }
   const [year, setYear] = uS(null);
@@ -200,7 +228,28 @@ function ArchivesPage() {
     setChannel(chs[0] || 'general');
   };
 
-  const colorOf = (id) => (window.MEMBERS.find(x => x.id === id) || {}).color || "#888";
+  const ARCHIVE_NAME_COLORS = {
+    kevin:    "#E14B3A",
+    yuan:     "#F2A93B",
+    alexis:   "#3AB7E1",
+    ayoub:    "#7DCB57",
+    anton:    "#A88AFF",
+    marc:     "#FF6BBE",
+    theo:     "#3ACBA1",
+    giovanni: "#FFD93B",
+  };
+  const FALLBACK_PALETTE = ["#E14B3A","#F2A93B","#3AB7E1","#7DCB57","#A88AFF","#FF6BBE","#3ACBA1","#FFD93B","#FF8A78","#88D8D8"];
+  const hashId = (s) => {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  };
+  const colorOf = (id) => {
+    if (!id) return "#888";
+    const key = String(id).toLowerCase().split(/[\s._-]+/)[0];
+    if (ARCHIVE_NAME_COLORS[key]) return ARCHIVE_NAME_COLORS[key];
+    return FALLBACK_PALETTE[hashId(String(id)) % FALLBACK_PALETTE.length];
+  };
   const nameOf  = (id) => (window.MEMBERS.find(x => x.id === id) || {}).name  || id;
 
   return (
@@ -274,10 +323,7 @@ function ArchivesPage() {
               </div>
               <div style={{ fontSize: 13 }}>{row.t}</div>
               {row.img && (
-                <img src={row.img} alt=""
-                  style={{ marginTop: 6, maxWidth: 320, maxHeight: 240, borderRadius: 4, border: "1px solid #C9B488", display: "block" }}
-                  onError={(e) => { e.target.style.display = "none"; }}
-                />
+                <ArchiveImage url={row.img} />
               )}
             </div>
           </div>

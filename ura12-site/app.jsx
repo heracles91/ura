@@ -121,7 +121,7 @@ function App() {
     try { return new Set(JSON.parse(localStorage.getItem('ura12_eggs') || '[]')); }
     catch { return new Set(); }
   });
-  const TOTAL_EGGS = 6;
+  const TOTAL_EGGS = 7;
   const findEgg = (name) => setEggs(prev => {
     if (prev.has(name)) return prev;
     const n = new Set(prev); n.add(name);

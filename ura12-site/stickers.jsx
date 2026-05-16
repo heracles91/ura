@@ -7,7 +7,7 @@ const STICKER_QUIPS = {
   alexis: ["Comment va mon pote ?", "Bon mon pote, tu connais déjà hein"],
   ayoub:  ["J'ai jamais dit ça !", "Nan moi je condamne", "Les femmes sont aussi fortes que les hommes"],
   anton:  ["Si seulement j'avais le pouvoir de la vitesse", "Regardez qui m'a envoyé un msg", "Les femmes c'est trop bien"],
-  marc:   ["Je le jure sur mon prénom", "Si j'ai tort je m'appelle pas Marc", "Lisez Moi quand je me réincarne en Sexy Dragon"],
+  marc:   ["Je le jure sur mon prénom", "Si j'ai tort je m'appelle pas Marc", "Lisez \"Moi quand je me réincarne en Sexy Dragon\""],
   theo:   ["Devine j'ai croisé qui aujourd'hui", "Ayoub y a une organisation qui t'appelle"],
   giovanni:["Et c'est moi le Roi ?", "Donc là on va rien dire ?", "Nom d'un Zeus !"]
 };
@@ -44,9 +44,10 @@ function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode,
     setBubble({ id: m.id, x: rect.left + 80, y: rect.top - 40, msg });
     setTimeout(() => setBubble(b => b && b.id === m.id ? null : b), 2200);
 
-    // sequence
+    // sequence — normalise to canonical key so it works regardless of supabase slug
+    const key = window.memberKey(m) || m.id;
     setSeq(prev => {
-      const nextSeq = [...prev, m.id].slice(-SECRET_SEQUENCE.length);
+      const nextSeq = [...prev, key].slice(-SECRET_SEQUENCE.length);
       if (nextSeq.length === SECRET_SEQUENCE.length && nextSeq.every((x, i) => x === SECRET_SEQUENCE[i])) {
         onSequenceComplete();
         return [];
