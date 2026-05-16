@@ -329,7 +329,7 @@ function App() {
         </div>
         {tweak.showMarquee && (
           <div onClick={onMarqueeClick} className="marquee" style={{ width: 360, padding: 0, height: 38, display: "flex", alignItems: "center", borderTop: 0, borderBottom: 0, borderRight: 0 }}>
-            <span>★ URA12 — cinq ans de souvenirs ★ {eggs.size}/{TOTAL_EGGS} secrets débloqués ★ essaie le code Konami ★ clique les stickers dans le bon ordre ★ tape "ura" n'importe où ★ </span>
+            <span>★ URA12 — cinq ans de souvenirs ★ {eggs.size}/{TOTAL_EGGS} secrets débloqués ★ essaie le code Konami ★ clique les stickers dans le bon ordre ★ tape "ura" n'importe où ★ trois clics dans l'angle, et le temps s'arrête ★ </span>
           </div>
         )}
         <div className="tray">
