@@ -43,8 +43,8 @@ function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode,
     let msg = quips[Math.floor(Math.random() * quips.length)];
 
     // RED HERRING: 7 rapid clicks on Marc (within 3s) → special bubble
-    const key = window.memberKey(m) || m.id;
-    if (key === "marc") {
+    const canon = window.memberKey(m) || m.id;
+    if (canon === "marc") {
       const now = Date.now();
       marcClicks.current = [...marcClicks.current.filter(t => now - t < 3000), now];
       if (marcClicks.current.length >= 7) {
@@ -57,10 +57,9 @@ function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode,
     setBubble({ id: m.id, x: rect.left + 80, y: rect.top - 40, msg });
     setTimeout(() => setBubble(b => b && b.id === m.id ? null : b), 2200);
 
-    // sequence — normalise to canonical key so it works regardless of supabase slug
-    const key = window.memberKey(m) || m.id;
+    // sequence — original m.id comparison (works as long as slugs match SECRET_SEQUENCE)
     setSeq(prev => {
-      const nextSeq = [...prev, key].slice(-SECRET_SEQUENCE.length);
+      const nextSeq = [...prev, m.id].slice(-SECRET_SEQUENCE.length);
       if (nextSeq.length === SECRET_SEQUENCE.length && nextSeq.every((x, i) => x === SECRET_SEQUENCE[i])) {
         onSequenceComplete();
         return [];
