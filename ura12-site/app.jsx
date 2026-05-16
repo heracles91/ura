@@ -122,11 +122,13 @@ function App() {
     catch { return new Set(); }
   });
   const TOTAL_EGGS = 7;
+  const [showMaxEggs, setShowMaxEggs] = aS(false);
   const findEgg = (name) => setEggs(prev => {
     if (prev.has(name)) return prev;
     const n = new Set(prev); n.add(name);
     try { localStorage.setItem('ura12_eggs', JSON.stringify([...n])); } catch {}
     showToast(`🔓 Secret débloqué : ${name} (${n.size}/${TOTAL_EGGS})`);
+    if (n.size === TOTAL_EGGS) setTimeout(() => setShowMaxEggs(true), 1200);
     return n;
   });
 
@@ -143,24 +145,58 @@ function App() {
     setTimeout(() => setGlitching(false), ms);
   };
 
+  const [fakeBoot, setFakeBoot] = aS(false);
   aE(() => {
     const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    const REVERSE_KONAMI = [...KONAMI].reverse();
     let buf = [];
     let typed = "";
+    const matches = (b, seq) => b.length === seq.length && b.every((k, i) => k.toLowerCase() === seq[i].toLowerCase());
     const onKey = (e) => {
       buf.push(e.key); buf = buf.slice(-KONAMI.length);
-      if (buf.length === KONAMI.length && buf.every((k, i) => k.toLowerCase() === KONAMI[i].toLowerCase())) {
+      if (matches(buf, KONAMI)) {
         findEgg("code konami");
         triggerGlitch(900);
         setTimeout(() => openWindow("secret"), 800);
+        buf = [];
+      } else if (matches(buf, REVERSE_KONAMI)) {
+        // RED HERRING: reverse konami → fake boot screen, no egg
+        triggerGlitch(400);
+        setFakeBoot(true);
+        buf = [];
       }
       if (e.key && e.key.length === 1) {
-        typed = (typed + e.key).slice(-3).toLowerCase();
-        if (typed === "ura") findEgg("tapé 'ura'");
+        typed = (typed + e.key).slice(-5).toLowerCase();
+        if (typed.endsWith("ura")) findEgg("tapé 'ura'");
+        if (typed === "ura12") {
+          // RED HERRING: typing "ura12" instead of "ura"
+          triggerGlitch(500);
+          showToast("presque. presque.");
+        }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // RED HERRING: fake boot console log
+  aE(() => {
+    const style = "color:#FF6B5B;font-family:monospace";
+    console.log("%c[URA12] system boot v5.0",          style);
+    console.log("%c[URA12] memory layer attached",     style);
+    console.log("%c[URA12] decoy seed loaded: 7-3-1-?-2", style);
+    console.log("%c[URA12] integrity check: OK (24/25)", style);
+    console.log("%c[URA12] one entry could not be verified — see entry 042", style);
+  }, []);
+
+  // RED HERRING: ?secret=1 in URL → fake "signal received" toast
+  aE(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get("secret") === "1") {
+        setTimeout(() => showToast("📡 signal reçu. coordonnées : 48.85, 2.35"), 1500);
+      }
+    } catch {}
   }, []);
 
   const openWindow = (id) => {
@@ -293,6 +329,12 @@ function App() {
 
       {showBirthday && <window.BirthdayCelebration user={user} onDone={() => setShowBirthday(false)} />}
 
+      {showMaxEggs && <window.MaxEggsCelebration onDone={() => setShowMaxEggs(false)} />}
+
+      {fakeBoot && <window.FakeBootOverlay onDone={() => setFakeBoot(false)} />}
+
+      {!showLogin && <window.PhantomSticker />}
+
       {toast && (
         <div style={{
           position: "fixed", bottom: 56, left: "50%", transform: "translateX(-50%)",
@@ -329,7 +371,7 @@ function App() {
         </div>
         {tweak.showMarquee && (
           <div onClick={onMarqueeClick} className="marquee" style={{ width: 360, padding: 0, height: 38, display: "flex", alignItems: "center", borderTop: 0, borderBottom: 0, borderRight: 0 }}>
-            <span>★ URA12 — cinq ans de souvenirs ★ {eggs.size}/{TOTAL_EGGS} secrets débloqués ★ essaie le code Konami ★ clique les stickers dans le bon ordre ★ tape "ura" n'importe où ★ trois clics dans l'angle, et le temps s'arrête ★ </span>
+            <span>★ URA12 — cinq ans de souvenirs ★ {eggs.size}/{TOTAL_EGGS} secrets débloqués ★ essaie le code Konami ★ clique les stickers dans le bon ordre ★ tape "ura" n'importe où ★ trois clics dans l'angle, et le temps s'arrête ★ regarde la 3ème lettre de chaque catchphrase ★ </span>
           </div>
         )}
         <div className="tray">

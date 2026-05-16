@@ -18,6 +18,7 @@ const SECRET_SEQUENCE = ["kevin", "ayoub", "yuan", "giovanni", "marc", "theo", "
 function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode, visible }) {
   const [seq, setSeq] = stkS([]);
   const [bubble, setBubble] = stkS(null); // { id, x, y, msg }
+  const marcClicks = stkR([]); // timestamps of recent Marc clicks (red herring)
 
   // initial random-ish positions, scattered around the desktop
   const initial = stkS(() => {
@@ -39,7 +40,19 @@ function FloatingStickers({ onSequenceComplete, onEggFound, eggsFound, hintMode,
     ev.stopPropagation();
     // bubble
     const quips = STICKER_QUIPS[m.id] || ["hi"];
-    const msg = quips[Math.floor(Math.random() * quips.length)];
+    let msg = quips[Math.floor(Math.random() * quips.length)];
+
+    // RED HERRING: 7 rapid clicks on Marc (within 3s) → special bubble
+    const key = window.memberKey(m) || m.id;
+    if (key === "marc") {
+      const now = Date.now();
+      marcClicks.current = [...marcClicks.current.filter(t => now - t < 3000), now];
+      if (marcClicks.current.length >= 7) {
+        msg = "j'ai dit non.";
+        marcClicks.current = [];
+      }
+    }
+
     const rect = ev.currentTarget.getBoundingClientRect();
     setBubble({ id: m.id, x: rect.left + 80, y: rect.top - 40, msg });
     setTimeout(() => setBubble(b => b && b.id === m.id ? null : b), 2200);
